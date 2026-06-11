@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Здоровье · 9 лет данных Apple Health</title>
+<meta name="description" content="Анализ архива Apple Health: тренды сердца, активности, сна и восстановления за 2017–2026." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="data_embed.js"></script>
+<style>
+:root{
+  --bg:#0c0f14; --bg-2:#11151c; --surface:#161b24; --surface-2:#1c2330;
+  --line:#252d3a; --line-soft:#1e2530;
+  --text:#e8edf4; --muted:#9aa6b8; --faint:#5e6a7d;
+  --accent:#34d6a8; --accent-dim:#1f8f6f;
+  --good:#3ecf8e; --warn:#f5b94d; --bad:#ef6a6a; --info:#5aa8ff;
+  --r:16px; --space:clamp(20px,4vw,40px);
+  --maxw:1180px;
+  --font:'Manrope',system-ui,-apple-system,sans-serif;
+  --mono:'Spline Sans Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--font); background:var(--bg); color:var(--text);
+  line-height:1.55; -webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(1200px 600px at 80% -10%, rgba(52,214,168,.06), transparent 60%);
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 var(--space)}
+a{color:var(--accent);text-decoration:none}
+.tnum{font-variant-numeric:tabular-nums lining-nums}
+
+/* HEADER */
+header.hero{padding:clamp(64px,12vh,140px) 0 clamp(40px,7vh,80px)}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:22px}
+.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+h1{font-size:clamp(34px,6vw,68px);font-weight:800;line-height:1.04;letter-spacing:-.02em;max-width:16ch}
+.lede{margin-top:24px;font-size:clamp(17px,2.2vw,21px);color:var(--muted);max-width:60ch;font-weight:400}
+.hero-meta{margin-top:36px;display:flex;flex-wrap:wrap;gap:10px 28px;color:var(--faint);font-size:14px;font-family:var(--mono)}
+.hero-meta b{color:var(--text);font-weight:500}
+
+/* KPI strip */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-top:46px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px 20px 18px}
+.kpi .v{font-size:30px;font-weight:800;letter-spacing:-.02em}
+.kpi .l{font-size:12.5px;color:var(--muted);margin-top:4px}
+.kpi .d{font-size:12px;margin-top:9px;font-weight:600;font-family:var(--mono)}
+.up{color:var(--good)} .down{color:var(--bad)} .flat{color:var(--faint)}
+
+/* SECTIONS */
+section{padding:clamp(44px,7vh,80px) 0;border-top:1px solid var(--line-soft)}
+.shead{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.snum{font-family:var(--mono);font-size:13px;color:var(--accent);font-weight:500}
+h2{font-size:clamp(24px,3.4vw,34px);font-weight:700;letter-spacing:-.015em}
+.sdesc{color:var(--muted);max-width:64ch;margin:4px 0 30px;font-size:16px}
+
+/* GRID + cards */
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:880px){.g2,.g3{grid-template-columns:1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.card h3{font-size:16px;font-weight:600;margin-bottom:2px}
+.card .sub{font-size:13px;color:var(--faint);margin-bottom:14px;font-family:var(--mono)}
+.chart-box{position:relative;height:260px}
+.chart-box.tall{height:300px}
+
+/* badge */
+.badge{display:inline-block;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:99px;letter-spacing:.02em}
+.b-good{background:rgba(62,207,142,.13);color:var(--good)}
+.b-warn{background:rgba(245,185,77,.14);color:var(--warn)}
+.b-bad{background:rgba(239,106,106,.14);color:var(--bad)}
+.b-info{background:rgba(90,168,255,.13);color:var(--info)}
+
+/* insight cards */
+.insight{border-left:3px solid var(--line);padding:18px 22px;background:var(--surface);border-radius:0 var(--r) var(--r) 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.insight.good{border-left-color:var(--good)}
+.insight.warn{border-left-color:var(--warn)}
+.insight.bad{border-left-color:var(--bad)}
+.insight.info{border-left-color:var(--info)}
+.insight h4{font-size:16.5px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.insight p{color:var(--muted);font-size:14.5px}
+.insight p .hl{color:var(--text);font-weight:600;font-family:var(--mono)}
+.stack{display:flex;flex-direction:column;gap:14px}
+
+/* ECG list */
+.ecg-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.ecg-item{display:flex;justify-content:space-between;align-items:center;background:var(--bg-2);border:1px solid var(--line);border-radius:10px;padding:11px 14px;font-size:13.5px}
+.ecg-item .date{font-family:var(--mono);color:var(--muted)}
+
+/* recommendations */
+.rec{counter-reset:r}
+.rec .item{display:flex;gap:18px;padding:20px 0;border-top:1px solid var(--line-soft)}
+.rec .item:first-child{border-top:none}
+.rec .n{counter-increment:r;flex:0 0 auto;width:34px;height:34px;border-radius:10px;background:var(--accent);color:#06231b;font-weight:800;display:grid;place-items:center;font-family:var(--mono)}
+.rec .n::before{content:counter(r)}
+.rec .item h4{font-size:16px;font-weight:700;margin-bottom:4px}
+.rec .item p{color:var(--muted);font-size:14.5px}
+
+footer{padding:48px 0 64px;border-top:1px solid var(--line-soft);color:var(--faint);font-size:13px}
+footer .disc{max-width:70ch;margin-top:10px;line-height:1.6}
+
+.logo{display:flex;align-items:center;gap:11px;margin-bottom:40px}
+.logo svg{color:var(--accent)}
+.logo span{font-weight:700;letter-spacing:-.01em;font-size:17px}
+.logo small{color:var(--faint);font-weight:500;font-family:var(--mono);font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="logo">
+    <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-label="Логотип">
+      <rect x="1" y="1" width="30" height="30" rx="9" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M4 17 H10 L13 9 L17 23 L20 15 H28" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div>
+      <span>Health Signals</span><br>
+      <small>Apple Health · 2017–2026</small>
+    </div>
+  </div>
+
+  <header class="hero">
+    <span class="eyebrow"><span class="dot"></span>Личная аналитика здоровья</span>
+    <h1>Девять лет тела в одном дашборде</h1>
+    <p class="lede">Архив Apple Health за 2017–2026: 6 млн ключевых записей, 88 типов метрик, 1206 тренировок и 17 ЭКГ. Ниже — главные тренды и то, на что стоит обратить внимание.</p>
+    <div class="hero-meta">
+      <span><b>10,1 млн</b> записей всего</span>
+      <span><b>88</b> типов метрик</span>
+      <span><b>1206</b> тренировок</span>
+      <span><b>17</b> ЭКГ — все в норме</span>
+      <span>период <b>2017 → 2026</b></span>
+    </div>
+
+    <div class="kpis" id="kpis"></div>
+  </header>
+
+  <!-- 1. СЕРДЦЕ -->
+  <section id="heart">
+    <div class="shead"><span class="snum">01</span><h2>Сердце и восстановление</h2></div>
+    <p class="sdesc">Главный сигнал архива. Пульс в покое медленно растёт, выносливость (VO₂Max) просела, а вариабельность ритма не растёт — несмотря на рекордные тренировки. Это сигнатура того, что нагрузка обгоняет восстановление.</p>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Пульс в покое</h3><div class="sub">уд/мин · среднее по году · ниже = лучше</div>
+        <div class="chart-box"><canvas id="cRHR"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>VO₂Max — кардиовыносливость</h3><div class="sub">мл/мин·кг · выше = лучше</div>
+        <div class="chart-box"><canvas id="cVO2"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Вариабельность ритма (HRV)</h3><div class="sub">мс · SDNN · выше = лучше восстановление</div>
+        <div class="chart-box"><canvas id="cHRV"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Дыхание и кислород</h3><div class="sub">частота дыхания (/мин) и SpO₂ (%)</div>
+        <div class="chart-box"><canvas id="cResp"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. АКТИВНОСТЬ -->
+  <section id="activity">
+    <div class="shead"><span class="snum">02</span><h2>Активность на пике</h2></div>
+    <p class="sdesc">Здесь всё отлично. Шаги, активные калории и минуты упражнений — на историческом максимуме. 2026 год — самый активный за всё время наблюдений.</p>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Шаги в день</h3><div class="sub">среднее по году</div>
+        <div class="chart-box"><canvas id="cSteps"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Активные калории в день</h3><div class="sub">ккал · энергия сверх базового обмена</div>
+        <div class="chart-box"><canvas id="cEnergy"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Минуты упражнений в день</h3><div class="sub">мин · по версии Apple Watch</div>
+        <div class="chart-box"><canvas id="cExer"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Дистанция ходьба + бег</h3><div class="sub">км в день · среднее по году</div>
+        <div class="chart-box"><canvas id="cDist"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. ТРЕНИРОВКИ -->
+  <section id="workouts">
+    <div class="shead"><span class="snum">03</span><h2>1206 тренировок</h2></div>
+    <p class="sdesc">Разнообразный и здоровый профиль с явным ростом регулярности. Май 2026 — рекордные 82 тренировки за месяц. Основа — ходьба и бег, но в архиве есть и плавание, дайвинг, лыжи, йога и HIIT.</p>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Тренировки по годам</h3><div class="sub">количество за год</div>
+        <div class="chart-box"><canvas id="cWYear"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Топ видов активности</h3><div class="sub">всего сессий за весь период</div>
+        <div class="chart-box"><canvas id="cWType"></canvas></div>
+      </div>
+      <div class="card" style="grid-column:1/-1">
+        <h3>Помесячно за последние 2 года</h3><div class="sub">количество тренировок · видно всплеск весны 2026</div>
+        <div class="chart-box"><canvas id="cWMonth"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. СОН -->
+  <section id="sleep">
+    <div class="shead"><span class="snum">04</span><h2>Сон стал лучше</h2></div>
+    <p class="sdesc">После аккуратного пересчёта (объединение интервалов сна, чтобы убрать задвоение от двух устройств — Apple Watch и Oura) видно стабильный рост: от 6,8 ч/ночь в 2021 до 8,0 ч/ночь в 2026.</p>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Сон по годам</h3><div class="sub">часов сна за ночь · среднее по году</div>
+        <div class="chart-box"><canvas id="cSleep"></canvas></div>
+      </div>
+      <div class="card">
+        <h3>Сон за последние 12 месяцев</h3><div class="sub">часов сна за ночь · по месяцам</div>
+        <div class="chart-box"><canvas id="cSleepR"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. ШУМ -->
+  <section id="noise">
+    <div class="shead"><span class="snum">05</span><h2>Шумовая нагрузка</h2></div>
+    <p class="sdesc">Наушники держатся в безопасной зоне (ниже порога 80 дБ). А вот окружающий шум вернулся к высоким значениям 2019 года — стоит присматривать.</p>
+    <div class="card">
+      <h3>Звуковое воздействие</h3><div class="sub">дБ · окружающий шум и наушники · порог риска 80 дБ</div>
+      <div class="chart-box tall"><canvas id="cNoise"></canvas></div>
+    </div>
+  </section>
+
+  <!-- 6. ЭКГ -->
+  <section id="ecg">
+    <div class="shead"><span class="snum">06</span><h2>ЭКГ — все в норме</h2></div>
+    <p class="sdesc">17 записей с 2020 года. Преобладает синусовый ритм. Был один эпизод «пульс выше 120» (на фоне нагрузки) и одна запись с пометкой «одышка» — но ритм при этом оставался синусовым. Поводов для тревоги нет.</p>
+    <div class="ecg-list" id="ecgList"></div>
+  </section>
+
+  <!-- 7. ИНСАЙТЫ -->
+  <section id="insights">
+    <div class="shead"><span class="snum">07</span><h2>Главные инсайты</h2></div>
+    <p class="sdesc">Что говорят данные, если читать их вместе.</p>
+    <div class="stack">
+      <div class="insight good"><h4><span class="badge b-good">Отлично</span> Рекордная активность</h4><p>Шаги выросли с <span class="hl">~8 100</span> (2017) до <span class="hl">~20 600</span> в день (2026). Активные калории в 2026 — <span class="hl">~950 ккал/день</span>, почти втрое выше уровня 2025.</p></div>
+      <div class="insight good"><h4><span class="badge b-good">Отлично</span> Сон стабилен и достаточен</h4><p>После пересчёта — <span class="hl">8,0 ч/ночь</span> в 2026 против <span class="hl">6,8 ч</span> в 2021. Последние месяцы стабильно в диапазоне 7,7–8,6 ч.</p></div>
+      <div class="insight warn"><h4><span class="badge b-warn">Внимание</span> Пульс в покое ползёт вверх</h4><p>С <span class="hl">~56</span> уд/мин (2018) до <span class="hl">60,4</span> (2026). При растущих тренировках это контринтуитивно — обычно признак накопленной усталости или стресса.</p></div>
+      <div class="insight warn"><h4><span class="badge b-warn">Внимание</span> VO₂Max просел</h4><p>С <span class="hl">41,3</span> (2018) до <span class="hl">34,0</span> (2026) — минус ~18%. Парадокс при таком объёме нагрузки: вероятно, не хватает интервальных/темповых сессий, которые двигают выносливость.</p></div>
+      <div class="insight info"><h4><span class="badge b-info">Контекст</span> HRV держится, но не растёт</h4><p>Вариабельность ритма ~<span class="hl">40 мс</span> стабильна с 2021. В связке с растущим пульсом покоя — второй намёк, что восстановление отстаёт от нагрузки.</p></div>
+      <div class="insight bad"><h4><span class="badge b-bad">Данным не доверять</span> Вес и рост</h4><p>Всего <span class="hl">10</span> записей веса за 9 лет из разных источников, и они противоречат друг другу (56 / 64 / 75 кг). Построить реальный тренд по составу тела нельзя — нужен один стабильный источник взвешивания.</p></div>
+    </div>
+  </section>
+
+  <!-- 8. РЕКОМЕНДАЦИИ -->
+  <section id="reco">
+    <div class="shead"><span class="snum">08</span><h2>Что стоит сделать</h2></div>
+    <div class="rec">
+      <div class="item"><div class="n"></div><div><h4>Добавить структуру тренировкам</h4><p>Связка «пульс покоя растёт + VO₂Max падает + HRV не растёт» — сигнатура того, что нагрузка обгоняет восстановление. Не сбавляй объём, но добавь 1–2 качественные интервальные сессии в неделю вместо части ходьбы, и чередуй тяжёлые дни с лёгкими.</p></div></div>
+      <div class="item"><div class="n"></div><div><h4>Сделать пульс покоя личным флагом</h4><p>Измеряй пульс покоя и HRV по утрам. Если пульс держится выше 62–63 несколько дней подряд — это сигнал «нужен день отдыха».</p></div></div>
+      <div class="item"><div class="n"></div><div><h4>Один источник веса</h4><p>Если хочешь отслеживать состав тела — взвешивайся регулярно на одних весах. Иначе графика динамики не будет.</p></div></div>
+      <div class="item"><div class="n"></div><div><h4>Следить за окружающим шумом</h4><p>Наушники в порядке, но окружающий шум вернулся к 61 дБ. В шумной среде стоит чаще делать паузы для слуха.</p></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <div>Health Signals · сгенерировано из личного экспорта Apple Health</div>
+    <p class="disc">Это не медицинское заключение. Данные собраны с потребительских устройств (Apple Watch, iPhone, Oura) и могут содержать погрешности и артефакты разных источников. Любые тревожные изменения стоит обсудить с врачом.</p>
+  </footer>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
