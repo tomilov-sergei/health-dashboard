@@ -206,9 +206,19 @@ footer .disc{max-width:70ch;margin-top:10px;line-height:1.6}
     </div>
   </section>
 
-  <!-- 4. СОН -->
+  <!-- 4. ВЕС -->
+  <section id="weight">
+    <div class="shead"><span class="snum">04</span><h2>Вес: реальные циклы</h2></div>
+    <p class="sdesc">Вес действительно колебался — периоды набора и сброса в диапазоне ~66–75 кг за девять лет. Последнее измерение — <b>72,7 кг</b>. Это нормальная живая динамика, а не погрешность датчиков.</p>
+    <div class="card">
+      <h3>Вес по измерениям</h3><div class="sub">кг · ключевые замеры 2017–2026</div>
+      <div class="chart-box tall"><canvas id="cWeight"></canvas></div>
+    </div>
+  </section>
+
+  <!-- 5. СОН -->
   <section id="sleep">
-    <div class="shead"><span class="snum">04</span><h2>Сон стал лучше</h2></div>
+    <div class="shead"><span class="snum">05</span><h2>Сон стал лучше</h2></div>
     <p class="sdesc">После аккуратного пересчёта (объединение интервалов сна, чтобы убрать задвоение от двух устройств — Apple Watch и Oura) видно стабильный рост: от 6,8 ч/ночь в 2021 до 8,0 ч/ночь в 2026.</p>
     <div class="grid g2">
       <div class="card">
@@ -224,7 +234,7 @@ footer .disc{max-width:70ch;margin-top:10px;line-height:1.6}
 
   <!-- 5. ШУМ -->
   <section id="noise">
-    <div class="shead"><span class="snum">05</span><h2>Шумовая нагрузка</h2></div>
+    <div class="shead"><span class="snum">06</span><h2>Шумовая нагрузка</h2></div>
     <p class="sdesc">Наушники держатся в безопасной зоне (ниже порога 80 дБ). А вот окружающий шум вернулся к высоким значениям 2019 года — стоит присматривать.</p>
     <div class="card">
       <h3>Звуковое воздействие</h3><div class="sub">дБ · окружающий шум и наушники · порог риска 80 дБ</div>
@@ -234,14 +244,14 @@ footer .disc{max-width:70ch;margin-top:10px;line-height:1.6}
 
   <!-- 6. ЭКГ -->
   <section id="ecg">
-    <div class="shead"><span class="snum">06</span><h2>ЭКГ — все в норме</h2></div>
+    <div class="shead"><span class="snum">07</span><h2>ЭКГ — все в норме</h2></div>
     <p class="sdesc">17 записей с 2020 года. Преобладает синусовый ритм. Был один эпизод «пульс выше 120» (на фоне нагрузки) и одна запись с пометкой «одышка» — но ритм при этом оставался синусовым. Поводов для тревоги нет.</p>
     <div class="ecg-list" id="ecgList"></div>
   </section>
 
   <!-- 7. ИНСАЙТЫ -->
   <section id="insights">
-    <div class="shead"><span class="snum">07</span><h2>Главные инсайты</h2></div>
+    <div class="shead"><span class="snum">08</span><h2>Главные инсайты</h2></div>
     <p class="sdesc">Что говорят данные, если читать их вместе.</p>
     <div class="stack">
       <div class="insight good"><h4><span class="badge b-good">Отлично</span> Рекордная активность</h4><p>Шаги выросли с <span class="hl">~8 100</span> (2017) до <span class="hl">~20 600</span> в день (2026). Активные калории в 2026 — <span class="hl">~950 ккал/день</span>, почти втрое выше уровня 2025.</p></div>
@@ -249,17 +259,17 @@ footer .disc{max-width:70ch;margin-top:10px;line-height:1.6}
       <div class="insight warn"><h4><span class="badge b-warn">Внимание</span> Пульс в покое ползёт вверх</h4><p>С <span class="hl">~56</span> уд/мин (2018) до <span class="hl">60,4</span> (2026). При растущих тренировках это контринтуитивно — обычно признак накопленной усталости или стресса.</p></div>
       <div class="insight warn"><h4><span class="badge b-warn">Внимание</span> VO₂Max просел</h4><p>С <span class="hl">41,3</span> (2018) до <span class="hl">34,0</span> (2026) — минус ~18%. Парадокс при таком объёме нагрузки: вероятно, не хватает интервальных/темповых сессий, которые двигают выносливость.</p></div>
       <div class="insight info"><h4><span class="badge b-info">Контекст</span> HRV держится, но не растёт</h4><p>Вариабельность ритма ~<span class="hl">40 мс</span> стабильна с 2021. В связке с растущим пульсом покоя — второй намёк, что восстановление отстаёт от нагрузки.</p></div>
-      <div class="insight bad"><h4><span class="badge b-bad">Данным не доверять</span> Вес и рост</h4><p>Всего <span class="hl">10</span> записей веса за 9 лет из разных источников, и они противоречат друг другу (56 / 64 / 75 кг). Построить реальный тренд по составу тела нельзя — нужен один стабильный источник взвешивания.</p></div>
+      <div class="insight info"><h4><span class="badge b-info">Контекст</span> Вес циклически меняется</h4><p>Реальная динамика в диапазоне <span class="hl">~66–75 кг</span> с периодами набора и сброса. Сейчас <span class="hl">72,7 кг</span>. Тело отзывчиво на нагрузку и образ жизни — это здоровая вариативность, а не тревожный сигнал.</p></div>
     </div>
   </section>
 
   <!-- 8. РЕКОМЕНДАЦИИ -->
   <section id="reco">
-    <div class="shead"><span class="snum">08</span><h2>Что стоит сделать</h2></div>
+    <div class="shead"><span class="snum">09</span><h2>Что стоит сделать</h2></div>
     <div class="rec">
       <div class="item"><div class="n"></div><div><h4>Добавить структуру тренировкам</h4><p>Связка «пульс покоя растёт + VO₂Max падает + HRV не растёт» — сигнатура того, что нагрузка обгоняет восстановление. Не сбавляй объём, но добавь 1–2 качественные интервальные сессии в неделю вместо части ходьбы, и чередуй тяжёлые дни с лёгкими.</p></div></div>
       <div class="item"><div class="n"></div><div><h4>Сделать пульс покоя личным флагом</h4><p>Измеряй пульс покоя и HRV по утрам. Если пульс держится выше 62–63 несколько дней подряд — это сигнал «нужен день отдыха».</p></div></div>
-      <div class="item"><div class="n"></div><div><h4>Один источник веса</h4><p>Если хочешь отслеживать состав тела — взвешивайся регулярно на одних весах. Иначе графика динамики не будет.</p></div></div>
+      <div class="item"><div class="n"></div><div><h4>Чаще фиксировать вес</h4><p>Динамика веса реальная, но замеров редко и они разбросаны. Регулярное взвешивание (хотя бы раз в неделю) даст чёткую кривую и поможет связать вес с нагрузкой и восстановлением.</p></div></div>
       <div class="item"><div class="n"></div><div><h4>Следить за окружающим шумом</h4><p>Наушники в порядке, но окружающий шум вернулся к 61 дБ. В шумной среде стоит чаще делать паузы для слуха.</p></div></div>
     </div>
   </section>

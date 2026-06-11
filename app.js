@@ -80,6 +80,7 @@ function kpiHTML(){
     {v:fmt(lastVal(vo2),1), l:'VO₂Max, мл/мин·кг', d:'−18% с 2018', cls:'down'},
     {v:fmt(lastVal(steps)/1000,1)+'k', l:'Шаги в день (2026)', d:'рекорд', cls:'up'},
     {v:fmt(lastVal(sleep),1)+' ч', l:'Сон за ночь (2026)', d:'+1,2 ч с 2021', cls:'up'},
+    {v:'72,7', l:'Вес сейчас, кг', d:'циклы 66–75', cls:'flat'},
     {v:fmt(lastVal(wk),0), l:'Тренировок в 2026', d:'максимум', cls:'up'},
   ];
   document.getElementById('kpis').innerHTML = items.map(i=>`
@@ -134,8 +135,30 @@ function ecgList(){
     <div class="ecg-item"><span class="date">${date}</span><span class="badge ${order[cls]||'b-info'}">${cls}</span></div>`).join('');
 }
 
+/* weight line (date-labelled) */
+function weightChart(){
+  const labels=D.weight.map(w=>w[0]);
+  const vals=D.weight.map(w=>w[1]);
+  new Chart(document.getElementById('cWeight'),{
+    type:'line',
+    data:{labels,datasets:[{
+      data:vals, borderColor:C.accent, borderWidth:2.5, tension:.3,
+      pointRadius:4, pointBackgroundColor:C.accent, pointBorderColor:'#0c0f14', pointBorderWidth:1.5, pointHoverRadius:6,
+      fill:'start', backgroundColor:(ctx)=>grad(ctx,C.accent)
+    }]},
+    options:baseOpts({plugins:{legend:{display:false},tooltip:{
+      backgroundColor:'#0c0f14',borderColor:C.line,borderWidth:1,titleColor:C.text,bodyColor:C.muted,
+      padding:11,cornerRadius:9,displayColors:false,callbacks:{label:(c)=>fmt(c.raw,1)+' кг'}
+    }},scales:{
+      x:{grid:{display:false},border:{color:C.line},ticks:{color:C.faint,font:{family:C.mono,size:11}}},
+      y:{grid:{color:C.line},border:{display:false},ticks:{color:C.faint,font:{family:C.mono,size:11},padding:8,callback:(v)=>v+' кг'}}
+    }})
+  });
+}
+
 /* render */
 kpiHTML();
+weightChart();
 lineChart('cRHR',D.restingHR,C.warn,{d:1,suffix:' уд/мин'});
 lineChart('cVO2',D.vo2max,C.bad,{d:1});
 lineChart('cHRV',D.hrv,C.info,{d:1,suffix:' мс'});
